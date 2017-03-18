@@ -83,12 +83,13 @@ MAVEN_OPTS="-XX:PermSize=256m -XX:MaxPermSize=512m" mvn spring-boot:run
 
 ##### MongoDB configuration:
 
-參考文章：
 
-《MongoDB极简教程》第一章 安装&环境配置
-http://www.jianshu.com/p/3d6a493f6418
-《MongoDB极简教程》第二章 MongoDB 基本命令
-http://www.jianshu.com/p/d7bb76febcad
+>參考文章：
+
+[《MongoDB极简教程》第一章 安装&环境配置](http://www.jianshu.com/p/3d6a493f6418)
+
+
+[《MongoDB极简教程》第二章 MongoDB 基本命令](http://www.jianshu.com/p/d7bb76febcad)
 
 
 
