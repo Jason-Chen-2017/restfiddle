@@ -131,6 +131,126 @@ Run repair operation to recover your database
 Most likely, your data will be repaired with the --repair option. In case it doesn't, delete the mongod.lock file and then run the above --repair command.
 ```
 
+##MongoDB配置数据库用户名密码
+
+####Step1.首先，切换到admin db (schema):
+
+```
+> use admin;
+switched to db admin
+
+```
+
+
+####Step2.在該 schema 下面設置用戶名，密碼：
+
+```
+
+> db.createUser({ user: "root",pwd: "root",customData:{name:"root"},roles:[{ role: "userAdminAnyDatabase",db: "admin" }]})
+Successfully added user: {
+	"user" : "root",
+	"customData" : {
+		"name" : "root"
+	},
+	"roles" : [
+		{
+			"role" : "userAdminAnyDatabase",
+			"db" : "admin"
+		}
+	]
+}
+> db.auth('root','root')
+1
+```
+
+####Step3.admin中直接给restfiddle权限
+
+```
+var r = 
+    {
+      "_id": "restfiddle.root",
+      "user": "root",
+      "db": "restfiddle",
+      "credentials": {
+        "SCRAM-SHA-1": {
+          "iterationCount": 10000,
+          "salt": "riZjwBYHvkcV99typ8BRMA==",
+          "storedKey": "E2QOruLrBNXD1mlQTX0TQogL/ws=",
+          "serverKey": "JEQhfa/5x7+aNzKrFvKRkctXXfQ="
+        }
+      },
+      "roles": [
+        {
+          "role": "dbOwner",
+          "db": "restfiddle"
+        },
+        {
+          "role": "read",
+          "db": "restfiddle"
+        },
+        {
+          "role": "readWrite",
+          "db": "restfiddle"
+        }
+      ]
+    }
+
+
+db.system.users.insert(r)
+
+
+```
+
+
+或者
+
+
+```
+use restfiddle
+db.createUser({"user":"jason","pwd":"123456","roles":["dbOwner","read","readWrite"]})
+```
+
+
+可以看到admin中已经有了jason这个管理员：
+
+```
+> use admin;
+> db.system.users.find();
+
+{
+  "_id": "restfiddle.jason",
+  "user": "jason",
+  "db": "restfiddle",
+  "credentials": {
+    "SCRAM-SHA-1": {
+      "iterationCount": 10000,
+      "salt": "HZsutqbxGjKVkPcY4305FQ==",
+      "storedKey": "bynL9UW9cIf0iPOLo9pGwCFz638=",
+      "serverKey": "PRPKH+7dVaKDJ/JE+7ZjQUe3whA="
+    }
+  },
+  "roles": [
+    {
+      "role": "dbOwner",
+      "db": "restfiddle"
+    },
+    {
+      "role": "read",
+      "db": "restfiddle"
+    },
+    {
+      "role": "readWrite",
+      "db": "restfiddle"
+    }
+  ]
+}
+
+Fetched 4 record(s) in 9ms
+
+```
+
+
+
 ##### For Gradle Users:
 
 *Build war*
@@ -166,6 +286,10 @@ applicationDefaultJvmArgs = [
 
 Using MongoDB 3.x
 ==========
+
+
+
+#####Windows
 
 Download the latest MongoDB version. After kappa release, RESTFiddle has enabled authentication and moved to version 3.0. To start using this, create a configuration file mongo.conf at a location.e.g. F:\restfiddledata\. Create mongo.log file for logging e.g. F:\restfiddledata\log\ This is how configuration file looks like:
 
@@ -205,6 +329,14 @@ Start the RESTFiddle application using the same command as earlier
 ```
 mvn spring-boot:run -Drun.jvmArguments="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000"
 ```
+
+
+
+#####Mac
+
+
+
+
 
 Deployment
 ==========

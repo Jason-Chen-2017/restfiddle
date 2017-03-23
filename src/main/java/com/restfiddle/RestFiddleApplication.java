@@ -16,13 +16,16 @@
 package com.restfiddle;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@Configuration
-@EnableAutoConfiguration
-@ComponentScan
+/**
+ * 应用入口类 main函数
+ */
+
+//@Configuration
+//@EnableAutoConfiguration
+//@ComponentScan({"com.restfiddle"})
+@SpringBootApplication
 public class RestFiddleApplication {
 
     public RestFiddleApplication() {
@@ -33,3 +36,32 @@ public class RestFiddleApplication {
     }
 
 }
+
+/**
+ * * Indicates a {@link org.springframework.context.annotation.Configuration configuration} class that declares one or
+ * more
+ * {@link org.springframework.context.annotation.Bean @Bean} methods and also triggers {@link
+ * org.springframework.boot.autoconfigure.EnableAutoConfiguration
+ * auto-configuration} and {@link org.springframework.context.annotation.ComponentScan component scanning}. This is a
+ * convenience
+ * annotation that is equivalent to declaring {@code @Configuration},
+ * {@code @EnableAutoConfiguration} and {@code @ComponentScan}.
+ *
+ * @author Phillip Webb
+ * @return the classes to exclude
+ * @Target(ElementType.TYPE)
+ * @Retention(RetentionPolicy.RUNTIME)
+ * @Documented
+ * @Inherited
+ * @Configuration
+ * @EnableAutoConfiguration
+ * @ComponentScan public @interface SpringBootApplication {
+ *
+ * /**
+ * Exclude specific auto-configuration classes such that they will never be applied.
+ *
+ * Class<?>[] exclude()default {};
+ *
+ * }
+ * @since 1.2.0
+ */
