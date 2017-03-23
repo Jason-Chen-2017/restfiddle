@@ -545,7 +545,7 @@ ul .dropdown-menu li {
 .username {
     background-color: inherit;
     border: none;
-    color: #999;
+    color: rgb(240,240,220);
     margin-top: 10px;
     font-size: 18px;
 }
