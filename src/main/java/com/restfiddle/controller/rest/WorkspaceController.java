@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,16 +43,16 @@ import com.restfiddle.util.TreeNode;
 @RestController
 @EnableAutoConfiguration
 @ComponentScan
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class WorkspaceController {
     Logger logger = LoggerFactory.getLogger(WorkspaceController.class);
 
     @Resource
     private ProjectController projectController;
-    
+
     @Resource
     private NodeController nodeController;
-    
+
     @Resource
     private WorkspaceRepository workspaceRepository;
 
@@ -112,25 +113,25 @@ public class WorkspaceController {
 
 	workspace.setName(updated.getName());
 	workspace.setDescription(updated.getDescription());
-	
+
 	workspaceRepository.save(workspace);
-	
+
 	return workspace;
     }
-    
+
     @RequestMapping(value = "/api/workspaces/{id}/export", method = RequestMethod.GET)
     public @ResponseBody
     List<TreeNode> export(@PathVariable("id") String id) {
 	Workspace workspace = workspaceRepository.findOne(id);
 	List<Project> projects = workspace.getProjects();
-	
+
 	List<TreeNode> projectTreeList = new ArrayList<TreeNode>();
 	TreeNode projectTree;
 	for (Project project : projects) {
 	    projectTree = nodeController.getProjectTree(project.getProjectRef().getId());
 	    projectTreeList.add(projectTree);
 	}
-	
+
 	return projectTreeList;
     }
 

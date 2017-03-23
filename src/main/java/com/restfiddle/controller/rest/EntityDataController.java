@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,7 +51,7 @@ import com.restfiddle.entity.GenericEntityData;
 import com.restfiddle.service.auth.EntityAuthService;
 
 @RestController
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class EntityDataController {
     private static final String SUCCESS = "success";
     private static final String PASSWORD = "password";
@@ -60,7 +61,7 @@ public class EntityDataController {
 
     @Autowired
     private MongoTemplate mongoTemplate;
-    
+
     @Autowired
     private EntityAuthService authService;
 
@@ -70,14 +71,14 @@ public class EntityDataController {
     public @ResponseBody
     String getEntityDataList(@PathVariable("projectId") String projectId, @PathVariable("name") String entityName,
 	    @RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "limit", required = false) Integer limit,
-	    @RequestParam(value = "sort", required = false) String sort, @RequestParam(value = "query", required = false) String query, 
+	    @RequestParam(value = "sort", required = false) String sort, @RequestParam(value = "query", required = false) String query,
 	    @RequestHeader(value = "authToken", required = false) String authToken) {
-	
+
 	JSONObject authRes = authService.authorize(projectId,authToken,"USER");
 	if(!authRes.getBoolean(SUCCESS)){
 	    return authRes.toString(4);
 	}
-	
+
 	DBCollection dbCollection = mongoTemplate.getCollection(projectId+"_"+entityName);
 	DBCursor cursor;
 	if (query != null && !query.isEmpty()) {
@@ -99,13 +100,13 @@ public class EntityDataController {
 	    cursor.limit(limit);
 	}
 	List<DBObject> array = cursor.toArray();
-	
+
 	if(entityName.equals("User")){
 	    for(DBObject dbObject : array){
 		dbObject.removeField(PASSWORD);
 	    }
 	}
-	
+
 	for(DBObject dbObject : array){
 	    dbRefToRelation(dbObject);
 	}
@@ -121,23 +122,23 @@ public class EntityDataController {
     String getEntityDataById(@PathVariable("projectId") String projectId, @PathVariable("name") String entityName,
 	    @PathVariable("id") String entityDataId,
 	    @RequestHeader(value = "authToken", required = false) String authToken) {
-	
+
 	JSONObject authRes = authService.authorize(projectId,authToken,"USER");
 	if(!authRes.getBoolean(SUCCESS)){
 	    return authRes.toString(4);
 	}
-	
+
 	DBCollection dbCollection = mongoTemplate.getCollection(projectId+"_"+entityName);
 
 	BasicDBObject queryObject = new BasicDBObject();
 	queryObject.append("_id", new ObjectId(entityDataId));
 
 	DBObject resultObject = dbCollection.findOne(queryObject);
-	
+
 	if(resultObject == null){
 	    return "Not Found";
 	}
-	
+
 	if(entityName.equals("User")){
 	    resultObject.removeField(PASSWORD);
 	}
@@ -157,8 +158,8 @@ public class EntityDataController {
     public @ResponseBody
     String createEntityData(@PathVariable("projectId") String projectId, @PathVariable("name") String entityName,
 	    @RequestBody Object genericEntityDataDTO,
-	    @RequestHeader(value = "authToken", required = false) String authToken) {	
-	
+	    @RequestHeader(value = "authToken", required = false) String authToken) {
+
 	String data;
 	if (!(genericEntityDataDTO instanceof Map)) {
 	    return null;
@@ -168,13 +169,13 @@ public class EntityDataController {
 	    JSONObject jsonObj = createJsonFromMap(map);
 	    data = jsonObj.toString();
 	}
-	
+
 	DBObject dbObject = (DBObject) JSON.parse(data);
-	
+
 	if (entityName.equals("User")) {
 	    return handleUserEntityData(projectId, dbObject, true);
 	}
-	
+
 	DBRef user;
 	JSONObject authRes = authService.authorize(projectId,authToken,"USER");
 	if(authRes.getBoolean(SUCCESS)){
@@ -182,16 +183,16 @@ public class EntityDataController {
 	} else {
 	    return authRes.toString(4);
 	}
-	
-	
+
+
 	// Create a new document for the entity.
 	DBCollection dbCollection = mongoTemplate.getCollection(projectId+"_"+entityName);
-	
+
 	relationToDBRef(dbObject, projectId);
-	
+
 	dbObject.put("createdBy", user);
 	dbObject.put("createdAt", new Date());
-	
+
 	dbCollection.save(dbObject);
 	dbRefToRelation(dbObject);
 	String json = dbObject.toString();
@@ -206,7 +207,7 @@ public class EntityDataController {
     String updateEntityData(@PathVariable("projectId") String projectId, @PathVariable("name") String entityName, @PathVariable("uuid") String uuid,
 	    @RequestBody Object genericEntityDataDTO,
 	    @RequestHeader(value = "authToken", required = false) String authToken) {
-	
+
 	DBRef user;
 	JSONObject authRes = authService.authorize(projectId,authToken,"USER");
 	if(authRes.getBoolean(SUCCESS)){
@@ -214,7 +215,7 @@ public class EntityDataController {
 	} else {
 	    return authRes.toString(4);
 	}
-	
+
 	DBObject resultObject = new BasicDBObject();
 	if (genericEntityDataDTO instanceof Map) {
 	    Map map = (Map) genericEntityDataDTO;
@@ -236,7 +237,7 @@ public class EntityDataController {
 	    for (String key : keySet) {
 		resultObject.put(key, obj.get(key));
 	    }
-	    
+
 	    if(entityName.equals("User")){
 		DBObject loggedInUser = dbCollection.findOne(user);
 		if(loggedInUser.get(USERNAME).equals(resultObject.get(USERNAME))){
@@ -245,12 +246,12 @@ public class EntityDataController {
 		    return new JSONObject().put(SUCCESS, false).put("msg", "unauthorized").toString(4);
 		}
 	    }
-	    
+
 	    relationToDBRef(resultObject, projectId);
-	    
+
 	    resultObject.put("updatedBy", user);
 	    resultObject.put("updatedAt", new Date());
-	    
+
 	    dbCollection.save(resultObject);
 	}
 	dbRefToRelation(resultObject);
@@ -266,22 +267,22 @@ public class EntityDataController {
     StatusResponse deleteEntityData(@PathVariable("projectId") String projectId, @PathVariable("name") String entityName,
 	    @PathVariable("uuid") String uuid,
 	    @RequestHeader(value = "authToken", required = false) String authToken) {
-	
+
 
 	StatusResponse res = new StatusResponse();
-	
+
 	JSONObject authRes = authService.authorize(projectId,authToken,"USER");
 	if(!authRes.getBoolean(SUCCESS)){
 	    res.setStatus("Unauthorized");
 	    return res;
 	}
-	
+
 	DBCollection dbCollection = mongoTemplate.getCollection(projectId+"_"+entityName);
 	BasicDBObject queryObject = new BasicDBObject();
 	queryObject.append("_id", new ObjectId(uuid));
 	dbCollection.remove(queryObject);
 
-	
+
 	res.setStatus("DELETED");
 
 	return res;
@@ -305,12 +306,12 @@ public class EntityDataController {
 	jsonObject.put("lastModifiedDate", entityData.getLastModifiedDate());
 	return jsonObject;
     }
-    
+
     private void dbRefToRelation(DBObject dbObject) {
 	if (dbObject == null) {
 	    return;
 	}
-	if (dbObject.containsField("_id")) 
+	if (dbObject.containsField("_id"))
 	    dbObject.put("_id", ((ObjectId) dbObject.get("_id")).toHexString());
 	for (String key : dbObject.keySet()) {
 	    Object obj = dbObject.get(key);
@@ -323,11 +324,11 @@ public class EntityDataController {
 	}
 
     }
-    
+
     private DBObject dbRefToRel(DBRef obj){
 	return new BasicDBObject().append("_rel",new BasicDBObject().append("entity", (obj.toString()).split("_")[1]).append("_id", ((ObjectId)obj.getId()).toHexString()));
     }
-    
+
     private void relationToDBRef(DBObject dbObject, String projectId) {
 	for (String key : dbObject.keySet()) {
 	    Object obj = dbObject.get(key);
@@ -342,7 +343,7 @@ public class EntityDataController {
 	    }
 	}
     }
-    
+
     private String handleUserEntityData(String projectId, DBObject user, boolean encryptPassword) {
 	JSONObject response = new JSONObject();
 

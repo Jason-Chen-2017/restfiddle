@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,13 +40,13 @@ import com.mongodb.DBRef;
 import com.restfiddle.service.auth.EntityAuthService;
 
 @RestController
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class EntitySessionController {
     Logger logger = LoggerFactory.getLogger(EntitySessionController.class);
 
     @Autowired
     private MongoTemplate mongoTemplate;
-    
+
     @Autowired
     private EntityAuthService authService;
 
@@ -53,17 +54,17 @@ public class EntitySessionController {
     public @ResponseBody
     String getEntityDataById(@PathVariable("projectId") String projectId,
 	    @RequestParam(value = "authToken", required = true) String llt) {
-	
+
 	boolean status = authService.logout(llt);
-	
+
 	JSONObject response = new JSONObject();
-	
+
 	if(status){
 	    response.put("msg", "sucessfully logged out");
 	}else{
-	    response.put("msg", "session expired"); 
+	    response.put("msg", "session expired");
 	}
-	
+
 	return response.toString(4);
     }
 
@@ -74,10 +75,10 @@ public class EntitySessionController {
 	DBObject data;
 	if (!(userDTO instanceof Map)) {
 	    return null;
-	} 
-	
+	}
+
 	JSONObject response = new JSONObject();
-	
+
 	Map map = (Map) userDTO;
 	JSONObject jsonObj = new JSONObject(map);
 	try {
@@ -87,11 +88,11 @@ public class EntitySessionController {
 	    return response.toString(4);
 	}
 	DBCollection userCollection = mongoTemplate.getCollection(projectId + "_User");
-	
+
 	DBObject user = userCollection.findOne(((DBRef)(data.get("user"))).getId());
 	user.removeField("password");
 	data.put("user", user);
-	
+
 	dbRefToRelation(data);
 	data.put("authToken", data.get("_id"));
 	data.removeField("_id");
@@ -102,12 +103,12 @@ public class EntitySessionController {
 	response = new JSONObject(json);
 	return response.toString(4);
     }
-    
+
     private void dbRefToRelation(DBObject dbObject) {
 	if (dbObject == null) {
 	    return;
 	}
-	if (dbObject.containsField("_id")) 
+	if (dbObject.containsField("_id"))
 	    dbObject.put("_id", ((ObjectId) dbObject.get("_id")).toHexString());
 	for (String key : dbObject.keySet()) {
 	    Object obj = dbObject.get(key);
@@ -120,7 +121,7 @@ public class EntitySessionController {
 	}
 
     }
-    
+
     private DBObject dbRefToRel(DBRef obj){
 	return new BasicDBObject().append("_rel",new BasicDBObject().append("entity", ((String) obj.getId()).split("_")[1]).append("_id", ((ObjectId)obj.getId()).toHexString()));
     }

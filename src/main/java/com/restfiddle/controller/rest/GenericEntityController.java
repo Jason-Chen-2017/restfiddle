@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,13 +42,13 @@ import com.restfiddle.entity.GenericEntityField;
 @RestController
 @EnableAutoConfiguration
 @ComponentScan
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class GenericEntityController {
     Logger logger = LoggerFactory.getLogger(GenericEntityController.class);
 
     @Autowired
     private GenericEntityRepository genericEntityRepository;
-    
+
     @Autowired
     private GenerateApiController generateApiController;
 
@@ -57,7 +58,7 @@ public class GenericEntityController {
 	logger.debug("Creating a new entity with information: " + genericEntityDTO);
 
 	String entityName = genericEntityDTO.getName();
-	
+
 	GenericEntity entity = new GenericEntity();
 	entity.setName(entityName);
 	entity.setDescription(genericEntityDTO.getDescription());
@@ -74,7 +75,7 @@ public class GenericEntityController {
 	    }
 	    entity.setFields(fields);
 	}
-	
+
 	entity = genericEntityRepository.save(entity);
 	return entity;
     }
@@ -116,7 +117,7 @@ public class GenericEntityController {
 
 	entity.setName(updated.getName());
 	entity.setDescription(updated.getDescription());
-	
+
 	List<GenericEntityFieldDTO> fieldsDTOs = updated.getFields();
 	if(fieldsDTOs != null){
 	    List<GenericEntityField> fields = entity.getFields() != null ? entity.getFields(): new ArrayList<GenericEntityField>();
@@ -124,17 +125,17 @@ public class GenericEntityController {
 		GenericEntityField field = new GenericEntityField();
 		field.setName(fieldDTO.getName());
 		field.setType(fieldDTO.getType());
-		
+
 		if(!fields.contains(field)){
 		    fields.add(field);
 		}
 	    }
-	    
+
 	    entity.setFields(fields);
 	}
-	
+
 	genericEntityRepository.save(entity);
-	
+
 	if(generateApi){
 	    generateApiController.generateApiByEntity(entity);
 	}

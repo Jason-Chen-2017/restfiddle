@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +44,7 @@ import com.restfiddle.entity.GenericEntity;
 import com.restfiddle.entity.GenericEntityField;
 
 @RestController
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class GenerateApiController {
     private static final String ENTITIES = "/entities/";
     private static final String API = "/api/";
@@ -80,12 +81,12 @@ public class GenerateApiController {
 
 	return generateApi(entityNode);
     }
-    
+
     StatusResponse generateApiByEntity(GenericEntity entity) {
-	
+
 	String baseNodeId = entity.getBaseNodeId();
 	BaseNode entityNode = nodeController.findById(baseNodeId);
-	
+
 	return generateApi(entityNode);
     }
 
@@ -169,7 +170,7 @@ public class GenerateApiController {
 
 	nodeName = "Update " + entityNode.getName();
 	createNode(nodeName, entityNode.getId(), projectId, conversationDTO);
-	
+
 	if(entityNode.getName().equals("User")){
 	 // API to GENERATE >> Login Entity
 	    conversationDTO = new ConversationDTO();
@@ -189,7 +190,7 @@ public class GenerateApiController {
 
 	    nodeName = "Login " + entityNode.getName();
 	    createNode(nodeName, entityNode.getId(), projectId, conversationDTO);
-	    
+
 	 // API to GENERATE >> Get Entity Data By Id
 	    conversationDTO = new ConversationDTO();
 	    rfRequestDTO = new RfRequestDTO();

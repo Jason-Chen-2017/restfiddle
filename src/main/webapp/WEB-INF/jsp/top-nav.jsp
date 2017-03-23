@@ -25,7 +25,7 @@
                     <li><a href="#" data-toggle="modal" id = "globalSettings" data-target="#globalSettingsModal">Global Settings</a></li>
                 </ul>
             </div>
-            <a class="navbar-brand" href="#">RESTFiddle</a>
+            <a class="navbar-brand rest-navbar-brand" href="#">RESTFiddle</a>
         </div>
         <div class="navbar-collapse collapse collapse" aria-expanded="false">
             <ul class="nav navbar-nav navbar-right">

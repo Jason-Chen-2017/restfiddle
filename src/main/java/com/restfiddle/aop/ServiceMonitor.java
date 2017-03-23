@@ -29,6 +29,6 @@ public class ServiceMonitor {
 
     @AfterReturning("execution(* com.restfiddle.controller.rest.*.*(..))")
     public void logServiceAccess(JoinPoint joinPoint) {
-	logger.info("Completed: " + joinPoint);
+        logger.info("Completed: " + joinPoint);
     }
 }

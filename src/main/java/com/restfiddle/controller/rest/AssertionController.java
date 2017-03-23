@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,28 +50,28 @@ import com.restfiddle.util.EntityToDTO;
 @RestController
 @EnableAutoConfiguration
 @ComponentScan
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class AssertionController {
     Logger logger = LoggerFactory.getLogger(AssertionController.class);
-    
+
     @Autowired
     private NodeRepository nodeRepository;
 
     @Resource
     private RfRequestRepository rfRequestRepository;
-    
+
     @Resource
     private AssertionRepository assertionRepository;
 
     @RequestMapping(value = "/api/requests/{nodeId}/asserts", method = RequestMethod.POST, headers = "Accept=application/json")
     public @ResponseBody
     Assertion save(@PathVariable("nodeId") String nodeId, @RequestBody AssertionDTO assertionDTO) {
-	
+
 	BaseNode node = nodeRepository.findOne(nodeId);
 	if(node == null || node.getConversation() == null){
 	    return null;
 	}
-	
+
 	RfRequest rfRequest = node.getConversation().getRfRequest();
 	if (rfRequest == null) {
 	    return null;
@@ -92,7 +93,7 @@ public class AssertionController {
 	    assertion.setBodyAsserts(bodyAsserts);
 	    rfRequest.setAssertion(assertion);
 	}
-	
+
 	assertionRepository.save(assertion);
 
 	RfRequest savedRFRequest = rfRequestRepository.save(rfRequest);
@@ -106,16 +107,16 @@ public class AssertionController {
 	if(node == null || node.getConversation() == null){
 	    return null;
 	}
-	
+
 	RfRequest rfRequest = node.getConversation().getRfRequest();
 	if (rfRequest == null) {
 	    return null;
 	}
-	
+
 	Assertion assertion = rfRequest.getAssertion();
 	return assertion;
     }
-    
+
     @RequestMapping(value = "/api/requests/{nodeId}/assertiondto", method = RequestMethod.GET)
     public @ResponseBody
     AssertionDTO getSavedAsserts(@PathVariable("nodeId") String nodeId) {
@@ -123,17 +124,17 @@ public class AssertionController {
 	if(node == null || node.getConversation() == null){
 	    return null;
 	}
-	
+
 	RfRequest rfRequest = node.getConversation().getRfRequest();
 	if (rfRequest == null) {
 	    return null;
 	}
-	
+
 	Assertion assertion = rfRequest.getAssertion();
 	AssertionDTO assertiondto = EntityToDTO.toDTO(assertion);
 	return assertiondto;
     }
-    
+
     @RequestMapping(value = "/api/requests/{nodeId}/assertiondto", method = RequestMethod.PUT, headers = "Accept=application/json")
     public @ResponseBody
     void update(@PathVariable("nodeId") String nodeId, @RequestBody AssertionDTO assertionDTO) {

@@ -22,6 +22,7 @@ import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,7 +34,7 @@ import com.restfiddle.dao.RfRequestRepository;
 import com.restfiddle.entity.HttpRequestHeader;
 
 @RestController
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class RfRequestController {
 
     @Resource

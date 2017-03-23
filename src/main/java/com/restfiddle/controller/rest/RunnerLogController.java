@@ -19,10 +19,14 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.restfiddle.dao.RunnerLogRepository;
+import com.restfiddle.dto.RunnerLogDTO;
+import com.restfiddle.entity.RunnerLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,14 +35,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.restfiddle.dao.RunnerLogRepository;
-import com.restfiddle.dto.RunnerLogDTO;
-import com.restfiddle.entity.RunnerLog;
-
 @RestController
 @EnableAutoConfiguration
 @ComponentScan
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class RunnerLogController {
     Logger logger = LoggerFactory.getLogger(RunnerLogController.class);
 
@@ -46,58 +46,63 @@ public class RunnerLogController {
     private RunnerLogRepository runnerLogRepository;
 
     @RequestMapping(value = "/api/runner/logs", method = RequestMethod.POST, headers = "Accept=application/json")
-    public @ResponseBody
+    public
+    @ResponseBody
     RunnerLog create(@RequestBody RunnerLogDTO runnerLogDTO) {
-	logger.debug("Creating a new runnerLog with information: " + runnerLogDTO);
+        logger.debug("Creating a new runnerLog with information: " + runnerLogDTO);
 
-	RunnerLog runnerLog = new RunnerLog();
+        RunnerLog runnerLog = new RunnerLog();
 
-	runnerLog.setName(runnerLogDTO.getName());
-	runnerLog.setDescription(runnerLogDTO.getDescription());
+        runnerLog.setName(runnerLogDTO.getName());
+        runnerLog.setDescription(runnerLogDTO.getDescription());
 
-	runnerLog.setNodeId(runnerLogDTO.getNodeId());
+        runnerLog.setNodeId(runnerLogDTO.getNodeId());
 
-	return runnerLogRepository.save(runnerLog);
+        return runnerLogRepository.save(runnerLog);
     }
 
     @RequestMapping(value = "/api/runner/logs/{id}", method = RequestMethod.DELETE, headers = "Accept=application/json")
-    public @ResponseBody
+    public
+    @ResponseBody
     RunnerLog delete(@PathVariable("id") String id) {
-	logger.debug("Deleting runnerLog with id: " + id);
+        logger.debug("Deleting runnerLog with id: " + id);
 
-	RunnerLog deleted = runnerLogRepository.findOne(id);
+        RunnerLog deleted = runnerLogRepository.findOne(id);
 
-	runnerLogRepository.delete(deleted);
+        runnerLogRepository.delete(deleted);
 
-	return deleted;
+        return deleted;
     }
 
     @RequestMapping(value = "/api/runner/logs", method = RequestMethod.GET)
-    public @ResponseBody
+    public
+    @ResponseBody
     List<RunnerLog> findAll() {
-	logger.debug("Finding all runner/logs");
+        logger.debug("Finding all runner/logs");
 
-	return runnerLogRepository.findAll();
+        return runnerLogRepository.findAll();
     }
 
     @RequestMapping(value = "/api/runner/logs/{id}", method = RequestMethod.GET)
-    public @ResponseBody
+    public
+    @ResponseBody
     RunnerLog findById(@PathVariable("id") String id) {
-	logger.debug("Finding runnerLog by id: " + id);
+        logger.debug("Finding runnerLog by id: " + id);
 
-	return runnerLogRepository.findOne(id);
+        return runnerLogRepository.findOne(id);
     }
 
     @RequestMapping(value = "/api/runner/logs/{id}", method = RequestMethod.PUT, headers = "Accept=application/json")
-    public @ResponseBody
+    public
+    @ResponseBody
     RunnerLog update(@PathVariable("id") Long id, @RequestBody RunnerLogDTO updated) {
-	logger.debug("Updating runnerLog with information: " + updated);
+        logger.debug("Updating runnerLog with information: " + updated);
 
-	RunnerLog runnerLog = runnerLogRepository.findOne(updated.getId());
+        RunnerLog runnerLog = runnerLogRepository.findOne(updated.getId());
 
-	runnerLog.setName(updated.getName());
-	runnerLog.setDescription(updated.getDescription());
+        runnerLog.setName(updated.getName());
+        runnerLog.setDescription(updated.getDescription());
 
-	return runnerLog;
+        return runnerLog;
     }
 }

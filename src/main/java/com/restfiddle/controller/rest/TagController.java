@@ -29,6 +29,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,13 +52,13 @@ import com.restfiddle.util.EntityToDTO;
 @RestController
 @EnableAutoConfiguration
 @ComponentScan
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class TagController {
     Logger logger = LoggerFactory.getLogger(TagController.class);
 
     @Resource
     private WorkspaceRepository workspaceRepository;
-    
+
     @Resource
     private TagRepository tagRepository;
 
@@ -73,15 +74,15 @@ public class TagController {
 	tag.setName(tagDTO.getName());
 	tag.setDescription(tagDTO.getDescription());
 	Tag savedTag = tagRepository.save(tag);
-	
+
 	// Update workspace
 	Workspace workspace = workspaceRepository.findOne(workspaceId);
 	workspace.getTags().add(savedTag);
 	workspaceRepository.save(workspace);
-	
+
 	return savedTag;
     }
-    
+
     @RequestMapping(value = "/api/tags", method = RequestMethod.POST, headers = "Accept=application/json")
     public @ResponseBody
     Tag create(@RequestBody TagDTO tagDTO) {
@@ -118,12 +119,12 @@ public class TagController {
 
 	// TODO: Reverse mapping is required for this
 	// return tagRepository.findTagsFromAWorkspace(workspaceId);
-	
+
 	Workspace workspace = workspaceRepository.findOne(workspaceId);
 	return workspace == null ? null : workspace.getTags();
-	
+
     }
-    
+
     @RequestMapping(value = "/api/tags", method = RequestMethod.GET)
     public @ResponseBody
     List<Tag> findAll() {
@@ -159,7 +160,7 @@ public class TagController {
     List<NodeDTO> findNodesByTag(@PathVariable("workspaceId") String workspaceId, @PathVariable("tagId") String tagId,
 	    @RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "limit", required = false) Integer limit,  @RequestParam(value = "search", required = false) String search, @RequestParam(value = "sortBy", required = false) String sortBy) {
 	logger.debug("Finding nodes by tag id: " + tagId);
-	
+
 	int pageNo = 0;
 	if (page != null && page > 0) {
 	    pageNo = page;
@@ -169,7 +170,7 @@ public class TagController {
 	if (limit != null && limit > 0) {
 	    numberOfRecords = limit;
 	}
-	
+
 	Sort sort = new Sort(Direction.DESC, "lastModifiedDate");
 	if("name".equals(sortBy)){
 	    sort = new Sort(Direction.ASC, "name");
@@ -178,13 +179,13 @@ public class TagController {
 	}else if ("nameDesc".equals(sortBy)){
 	    sort = new Sort(Direction.DESC, "name");
 	}
-	
+
 	Pageable pageable = new PageRequest(pageNo, numberOfRecords, sort);
-	
+
 	Page<BaseNode> paginatedTaggedNodes = nodeRepository.searchTaggedNodes(tagId, search != null ? search : "", pageable);
-	
+
 	List<BaseNode> taggedNodes = paginatedTaggedNodes.getContent();
-	
+
 	List<NodeDTO> response = new ArrayList<NodeDTO>();
 	for(BaseNode item : taggedNodes){
 	    response.add(EntityToDTO.toDTO(item));

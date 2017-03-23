@@ -60,6 +60,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,7 +75,7 @@ import org.springframework.web.servlet.ModelAndView;
 @RestController
 @EnableAutoConfiguration
 @ComponentScan
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW) // readOnly = false,
 public class ApiController {
     private static final String HTTP_LOCALHOST_8080_OAUTH_RESPONSE = "http://localhost:8080/oauth/response";
 

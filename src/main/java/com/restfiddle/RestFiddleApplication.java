@@ -19,6 +19,9 @@ import org.springframework.boot.SpringApplication;
 
 /**
  * 应用入口类 main函数
+ *
+ * @author Jason
+ *         2017.3.23 李思琪
  */
 
 //@Configuration
@@ -27,7 +30,6 @@ import org.springframework.boot.SpringApplication;
 //@SpringBootApplication
 @RestBoot
 public class RestFiddleApplication {
-
     public RestFiddleApplication() {
     }
 
@@ -35,33 +37,36 @@ public class RestFiddleApplication {
         SpringApplication.run(RestFiddleApplication.class, args);
     }
 
-}
+    //static {
+    //
+    //    System.out.println("启动MongoDB ...... ");
+    //    MongodExecutable mongodExecutable = null;
+    //
+    //    try {
+    //        MongodStarter starter = MongodStarter.getDefaultInstance();
+    //
+    //        String bindIp = "localhost";
+    //        int port = 12345;
+    //        IMongodConfig mongodConfig = new MongodConfigBuilder()
+    //            .version(Version.Main.PRODUCTION)
+    //            .net(new Net(bindIp, port, Network.localhostIsIPv6()))
+    //            .build();
+    //
+    //        mongodExecutable = starter.prepare(mongodConfig);
+    //        MongodProcess mongod = mongodExecutable.start();
+    //
+    //        MongoClient mongo = new MongoClient(bindIp, port);
+    //        DB db = mongo.getDB("test");
+    //        DBCollection col = db.createCollection("testCol", new BasicDBObject());
+    //        col.save(new BasicDBObject("testDoc", new Date()));
+    //    } catch (Exception e) {
+    //        System.out.println("启动MongoDB异常：" + e.getMessage());
+    //        e.printStackTrace();
+    //
+    //    } finally {
+    //        if (mongodExecutable != null) { mongodExecutable.stop(); }
+    //    }
+    //
+    //}
 
-/**
- * * Indicates a {@link org.springframework.context.annotation.Configuration configuration} class that declares one or
- * more
- * {@link org.springframework.context.annotation.Bean @Bean} methods and also triggers {@link
- * org.springframework.boot.autoconfigure.EnableAutoConfiguration
- * auto-configuration} and {@link org.springframework.context.annotation.ComponentScan component scanning}. This is a
- * convenience
- * annotation that is equivalent to declaring {@code @Configuration},
- * {@code @EnableAutoConfiguration} and {@code @ComponentScan}.
- *
- * @author Phillip Webb
- * @return the classes to exclude
- * @Target(ElementType.TYPE)
- * @Retention(RetentionPolicy.RUNTIME)
- * @Documented
- * @Inherited
- * @Configuration
- * @EnableAutoConfiguration
- * @ComponentScan public @interface SpringBootApplication {
- *
- * /**
- * Exclude specific auto-configuration classes such that they will never be applied.
- *
- * Class<?>[] exclude()default {};
- *
- * }
- * @since 1.2.0
- */
+}

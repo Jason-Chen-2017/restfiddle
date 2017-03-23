@@ -24,15 +24,6 @@ public class PropertyConfig {
 	return new PropertySourcesPlaceholderConfigurer();
     }
 
-    /**
-     * Properties to support the 'production' mode of operation.
-     */
-    @Configuration
-    @Profile("production")
-    @PropertySource(value={"classpath:env-production.properties"})
-    static class Production {
-	// Define additional beans for this profile here
-    }
 
     /**
      * Properties to support the 'test' mode of operation.
@@ -51,4 +42,15 @@ public class PropertyConfig {
     @PropertySource(value={"classpath:env-test.properties"})
     static class Test {
     }
+
+    /**
+     * Properties to support the 'production' mode of operation.
+     */
+    @Configuration
+    @Profile("production")
+    @PropertySource(value={"classpath:env-production.properties"})
+    static class Production {
+        // Define additional beans for this profile here
+    }
+
 }

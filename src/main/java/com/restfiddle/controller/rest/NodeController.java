@@ -32,6 +32,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -62,7 +63,7 @@ import com.restfiddle.util.TreeNode;
 @RestController
 @EnableAutoConfiguration
 @ComponentScan
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class NodeController {
     private static final String PROJECT = "PROJECT";
 
@@ -369,7 +370,7 @@ public class NodeController {
 	}else{
 	    sortTree(rootNode, "position", order);
 	}
-	
+
 	return rootNode;
     }
 
@@ -500,7 +501,7 @@ public class NodeController {
 	nodeRepository.save(node);
 	return Boolean.TRUE;
     }
-    
+
     @RequestMapping(value = "/api/nodes/{id}/requests", method = RequestMethod.GET)
     public @ResponseBody
     List<BaseNode> getProjectRequests(@PathVariable("id") String id, @RequestParam(value = "page", required = false) Integer page,
@@ -514,7 +515,7 @@ public class NodeController {
 	String projectId = projectRefNode.getProjectId();
 
 	List<BaseNode> requestsNodes = nodeRepository.findRequestsFromAProject(projectId, search != null ? search : "");
-	
+
 	return requestsNodes;
     }
 
@@ -527,7 +528,7 @@ public class NodeController {
 	Long oldPosition = node.getPosition();
 	BaseNode newRefNode = nodeRepository.findOne(newRefNodeId);
 	BaseNode oldParentNode = nodeRepository.findOne(node.getParentId());
-	
+
 	Long newPosition;
 	String newParentId;
 	if(position.equals("over")){
@@ -535,7 +536,7 @@ public class NodeController {
 	    newPosition = (long) 1;
 	}else if(position.equals("before")){
 	    newParentId = newRefNode.getParentId();
-	    newPosition = newRefNode.getPosition(); 
+	    newPosition = newRefNode.getPosition();
 	}else{
 	    newParentId = newRefNode.getParentId();
 	    newPosition = newRefNode.getPosition()+1;
@@ -566,7 +567,7 @@ public class NodeController {
 		nodeRepository.save(newFolderChild);
 	    }
 	}
-	
+
 	//If node is moved within the same folder, updating new folder is sufficient
 	if(oldParentNode.getId().equals(newParentId)){
 	    return;
@@ -582,7 +583,7 @@ public class NodeController {
 	    }
 	}
     }
-    
+
     @RequestMapping(value = "/api/workspaces/{workspaceId}/projects", method = RequestMethod.GET)
     public @ResponseBody
     List<BaseNode> findProjectsFromAWorkspace(@PathVariable("workspaceId") String workspaceId,

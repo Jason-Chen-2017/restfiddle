@@ -26,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,7 +43,7 @@ import com.restfiddle.entity.ActivityLog;
 @RestController
 @EnableAutoConfiguration
 @ComponentScan
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class ActivityLogController {
     Logger logger = LoggerFactory.getLogger(ActivityLogController.class);
 
@@ -74,13 +75,13 @@ public class ActivityLogController {
 
     @RequestMapping(value = "/api/logs", method = RequestMethod.GET)
     public @ResponseBody
-    Page<ActivityLog> findAll(@RequestParam(value = "workspaceId", required = false) String workspaceId, 
-	    @RequestParam(value = "search", required = false) String search, 
+    Page<ActivityLog> findAll(@RequestParam(value = "workspaceId", required = false) String workspaceId,
+	    @RequestParam(value = "search", required = false) String search,
 	    @RequestParam(value = "page", required = false) Integer page,
 	    @RequestParam(value = "limit", required = false) Integer limit,
 	    @RequestParam(value = "sortBy", required = false) String sortBy) {
 	logger.debug("Finding all logs");
-	
+
 	int pageNo = 0;
 	if (page != null && page > 0) {
 	    pageNo = page;
@@ -90,7 +91,7 @@ public class ActivityLogController {
 	if (limit != null && limit > 0) {
 	    numberOfRecords = limit;
 	}
-	
+
 	Sort sort = new Sort(Direction.DESC, "lastModifiedDate");
 	if("name".equals(sortBy)){
 	    sort = new Sort(Direction.ASC, "name");
@@ -99,10 +100,10 @@ public class ActivityLogController {
 	}else if ("nameDesc".equals(sortBy)){
 	    sort = new Sort(Direction.DESC, "name");
 	}
-	
+
 	Pageable pageable = new PageRequest(pageNo, numberOfRecords, sort);
 	Page<ActivityLog> result = activityLogRepository.findActivivtyLogsFromWorkspace(workspaceId, search != null ? search : "", pageable);
-	
+
 	return result;
     }
 

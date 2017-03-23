@@ -38,6 +38,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,13 +55,13 @@ import com.restfiddle.dto.TagDTO;
 @RestController
 @EnableAutoConfiguration
 @ComponentScan
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class ReportController {
     Logger logger = LoggerFactory.getLogger(ReportController.class);
-    
+
     @Autowired
     private NodeRepository nodeRepository;
-    
+
     @Autowired
     private ApiController apiController;
 
@@ -71,23 +72,23 @@ public class ReportController {
     public void generateRunProjectReport(@PathVariable("id") Long id) {
 
     }
-    
+
     @RequestMapping(value = "/api/processor/projects/{id}/report", method = RequestMethod.GET)
     public void generateRunProjectReport(@PathVariable("id") String id, @RequestParam(value = "envId", required = false) String envId, HttpServletResponse response) {
 	List<NodeStatusResponseDTO> nodeStatusResponse = apiController.runProjectById(id, envId);
 	generateRunNodeReport(nodeStatusResponse, response);
     }
-    
+
     @RequestMapping(value = "/api/processor/folders/{id}/report", method = RequestMethod.GET)
     public void generateRunFolderReport(@PathVariable("id") String id, @RequestParam(value = "envId", required = false) String envId, HttpServletResponse response) {
 	List<NodeStatusResponseDTO> nodeStatusResponse = apiController.runFolderById(id, envId);
 	generateRunNodeReport(nodeStatusResponse, response);
     }
-    
+
     public void generateRunNodeReport(List<NodeStatusResponseDTO> nodeStatusResponse, HttpServletResponse response) {
 	String reportTemplateFilePath = "report-template" + File.separator + "rf_doc_template.jasper";
 	Resource resource = new ClassPathResource(reportTemplateFilePath);
-	
+
 	List<ReportDTO> apiNodes = new ArrayList<ReportDTO>();
 	ReportDTO node = new ReportDTO();
 	apiNodes.add(node);
