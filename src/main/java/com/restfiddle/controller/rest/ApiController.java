@@ -109,12 +109,20 @@ public class ApiController {
     @Resource
     private ActivityLogRepository activityLogRepository;
 
+    /**
+     * 接口执行引擎
+     *
+     * @param runnerLogId
+     * @param rfRequestDTO
+     * @return
+     */
+
     @RequestMapping(
         value = "/api/processor",
         method = RequestMethod.POST,
         headers = "Accept=application/json",
         produces = "text/html;charset=UTF-8")
-        // 输出中文，指定编码
+    // 输出中文，指定编码
     ConversationDTO requestProcessor(@RequestParam(value = "runnerLogId", required = false) String runnerLogId,
                                      @RequestBody RfRequestDTO rfRequestDTO) {
         Conversation existingConversation = null;
@@ -126,6 +134,7 @@ public class ApiController {
         if (rfRequestDTO == null) {
             return null;
         } else if (rfRequestDTO.getId() != null && !rfRequestDTO.getId().isEmpty()) {
+            //获取当前请求对象
             RfRequest rfRequest = rfRequestRepository.findOne(rfRequestDTO.getId());
             String conversationId = rfRequest != null ? rfRequest.getConversationId() : null;
             existingConversation = conversationId != null ? conversationRepository.findOne(conversationId) : null;

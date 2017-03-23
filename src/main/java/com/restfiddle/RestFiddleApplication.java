@@ -16,7 +16,6 @@
 package com.restfiddle;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * 应用入口类 main函数
@@ -25,7 +24,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 //@Configuration
 //@EnableAutoConfiguration
 //@ComponentScan({"com.restfiddle"})
-@SpringBootApplication
+//@SpringBootApplication
+@RestBoot
 public class RestFiddleApplication {
 
     public RestFiddleApplication() {

@@ -50,6 +50,7 @@ public class GenericHandler {
 
     /**
      * This method will be used for API processing and the method below this will be deprecated.
+     * 执行请求
      *
      * @param rfRequestDTO
      * @return
@@ -62,9 +63,11 @@ public class GenericHandler {
         RfResponseDTO responseDTO = null;
         try {
             long startTime = System.currentTimeMillis();
+            // 执行
             CloseableHttpResponse httpResponse = httpClient.execute(httpUriRequest);
             long endTime = System.currentTimeMillis();
             long duration = endTime - startTime;
+            // 结果处理
             responseDTO = buildRfResponse(httpResponse, duration, rfRequestDTO);
         } catch (ClientProtocolException e) {
             logger.error(e.getMessage(), e);
@@ -82,12 +85,22 @@ public class GenericHandler {
         return responseDTO;
     }
 
+    /**
+     * 执行结果处理
+     *
+     * @param httpResponse
+     * @param duration
+     * @param rfRequestDTO
+     * @return
+     * @throws IOException
+     */
+
     private RfResponseDTO buildRfResponse(CloseableHttpResponse httpResponse, long duration, RfRequestDTO rfRequestDTO)
         throws IOException {
         RfResponseDTO responseDTO = buildRfResponse(httpResponse);
 
-        AssertionDTO assertionDTO = rfRequestDTO.getAssertionDTO() != null ? rfRequestDTO.getAssertionDTO()
-            : new AssertionDTO();
+        AssertionDTO assertionDTO = rfRequestDTO.getAssertionDTO() != null ?
+            rfRequestDTO.getAssertionDTO() : new AssertionDTO();
 
         assertionDTO.setResponseTime((int)duration);
 
