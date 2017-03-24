@@ -3,16 +3,11 @@ RESTFeel
 
 
 
-![RESTFeel接口测试平台](https://github.com/Jason-Chen-2017/restfiddle/blob/master/restfeel1.png)
-
-![RESTFeel接口测试平台](https://github.com/Jason-Chen-2017/restfiddle/blob/master/restfeel2.png)
-
-
 
 > RESTFeel: 一个企业级的API管理&测试平台。RESTFeel帮助你设计、开发、测试您的API。
 
-###功能简介：
-
+功能简介：
+========
 * 请求生成器-使HTTP请求轻松。
 * 请求树以树的形式组织请求。
 * 合作-添加团队成员，管理多个项目。
@@ -26,6 +21,13 @@ RESTFeel
 * swagger API文档生成。
 * 标签-标签提供了一个有用的方式来组合相关的要求。
 * 安全，访问控制，通知机制等。
+
+
+
+![RESTFeel接口测试平台](https://github.com/Jason-Chen-2017/restfiddle/blob/master/restfeel1.png)
+
+![RESTFeel接口测试平台](https://github.com/Jason-Chen-2017/restfiddle/blob/master/restfeel2.png)
+
 
 
 
