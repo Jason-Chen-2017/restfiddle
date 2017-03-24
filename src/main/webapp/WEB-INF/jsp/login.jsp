@@ -6,10 +6,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>RESTFiddle</title>
+    <title>RestFeel</title>
     <link rel="shortcut icon" href="/favicon.ico"/>
     <link href="css/font-awesome.min.css" rel="stylesheet">
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <%--<link href="css/bootstrap.min.css" rel="stylesheet">--%>
+    <link href="css/bootstrap.css" rel="stylesheet">
     <link href="css/ui.fancytree.css" rel="stylesheet">
     <link href="css/prettify/prettify.css" rel="stylesheet">
     <link href="css/octicons/octicons.css" rel="stylesheet">
@@ -31,13 +32,13 @@
                 <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span
                     class="icon-bar"></span> <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">RESTFiddle</a>
+            <a class="navbar-brand" href="#">RestFeel接口测试平台</a>
         </div>
     </div>
 </div>
 <div class="container-fluid">
     <form class="form-signin" action='${pageContext.request.contextPath}/login' method='POST'>
-        <h2 class="form-signin-heading">RESTFiddle</h2>
+        <h2 class="form-signin-heading" style="text-align: center">RestFeel</h2>
 
         <div class="input-group" style="margin-bottom: 5px;">
             <span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>
@@ -49,12 +50,28 @@
                    placeholder="Enter Password" required>
         </div>
 
-        <button class="btn btn-primary btn-block" type="submit">Sign in to RESTFiddle</button>
+        <button class="btn btn-primary btn-block" type="submit">登录</button>
     </form>
 </div>
 
 <script>
     var ctx = "${pageContext.request.contextPath}";
 </script>
+
+<footer class="panel-footer rest-footer">
+    <div class="footer-nav">
+        <a href="/" target="_blank" hidefocus="true">RestFeel</a>
+        |
+        <a href="https://universsky.github.io/" target="_blank">光剑免费图书馆</a>
+        |
+        <a href="https://jason-chen-2017.github.io/Jason-Chen-2017/" target="_blank">博客</a>
+        |
+        <a href="#" target="_blank" hidefocus="true">微信公众号：ols-lightshadow</a>
+    </div>
+    <div class="copyright">RestFeel 2017-7017</div>
+
+</footer>
+
+
 </body>
 </html>

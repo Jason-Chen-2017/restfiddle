@@ -11,6 +11,22 @@ body {
     color: rgb(255, 255, 255);
 }
 
+.rest-footer {
+    margin: 450px 0 0 0 !important;
+    text-align: center !important;
+}
+
+#response-preview {
+    display: block; /* iframes are inline by default */
+    border: none; /* Reset default border */
+    height: 100vh; /* Viewport-relative units */
+    width: 100vh;
+}
+
+.preview-iframe {
+    width: 100% !important;
+}
+
 .modal {
     overflow-y: auto;
 }
@@ -545,7 +561,7 @@ ul .dropdown-menu li {
 .username {
     background-color: inherit;
     border: none;
-    color: rgb(240,240,220);
+    color: rgb(240, 240, 220);
     margin-top: 10px;
     font-size: 18px;
 }
@@ -650,13 +666,6 @@ ul .dropdown-menu li {
 
 span.fancytree-title {
     height: 2.3em;
-}
-
-#response-preview {
-    display: block; /* iframes are inline by default */
-    border: none; /* Reset default border */
-    height: 100vh; /* Viewport-relative units */
-    width: 100vh;
 }
 
 .stylish-input-group .input-group-addon {

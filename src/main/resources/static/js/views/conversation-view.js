@@ -12,6 +12,11 @@ define(function (require) {
 
     require('libs/prettify/prettify');
     require('typeahead');
+
+    require('plugin/jquery.jsonview');
+    require('plugin/bootstrap-dialog');
+
+
     var lastResponse;
     var CodeMirror = require('codemirror/lib/codemirror');
     var cmjs = require('codemirror/mode/javascript/javascript');
@@ -49,6 +54,7 @@ define(function (require) {
         limit: 10,
         source: apiUrls.ttAdapter()
     });
+
 
     // HTTP HEADERS
     var httpHeaders = new Bloodhound({
@@ -584,6 +590,10 @@ define(function (require) {
             }(this));
         },
 
+        /**
+         * 执行引擎运行结果处理
+         * @Author 光剑 2017.3.24
+         */
         run: function () {
             $('#loadingRequest').show();
             localStorage.setItem("lastResponse", lastResponse);
@@ -595,11 +605,10 @@ define(function (require) {
                 contentType: "application/json",
                 success: function (conversation, statusText, xhr) {
                     var response = conversation.rfResponseDTO;
-                    console.log(response.body)
-
+                    var result = response.body;
 
                     $('#req-time').html(conversation.duration);
-                    var length = response.body.length;
+                    var length = result.length;
                     $('#status-code').html(response.status);
                     $('#content-size').html(length);
                     lastResponse = JSON.stringify(response);
@@ -618,26 +627,39 @@ define(function (require) {
                         iframe = (iframe.contentWindow) ? iframe.contentWindow : (iframe.contentDocument.document) ? iframe.contentDocument.document : iframe.contentDocument;
                         iframe.document.open();
 
-                        console.log(response.body)
-
                         if (imageTypes.indexOf(contentType) > -1) {
-                            $("#response-wrapper").html('<br><pre class="prettyprint">' + '<img src="data:' + contentType + ';base64,' + btoa(response.body) + '"></img>' + '</pre>');
-                            iframe.document.write('<br><pre class="prettyprint">' + '<img src="data:' + contentType + ';base64,' + btoa(response.body) + '"></img>' + '</pre>');
-                        } else if (contentType.indexOf("pdf") > -1 || contentType.indexOf("attachment") > -1) {                                       //ToDo: form method should be POST, as there can be query params
+                            $("#response-wrapper").html('<br><div class="prettyprint">' + '<img src="data:' + contentType + ';base64,' + btoa(result) + '"></img>' + '</div>');
+                            iframe.document.write('<br><div class="prettyprint">' + '<img src="data:' + contentType + ';base64,' + btoa(result) + '"></img>' + '</div>');
+                            console.log(1)
+                        } else if (contentType.indexOf("pdf") > -1 || contentType.indexOf("attachment") > -1) { //ToDo: form method should be POST, as there can be query params
                             var form = $('<form method="GET" action="' + encodeURI($("#evaluatedApiUrl").val()).replace(/%7B/g, '{').replace(/%7D/g, '}') + '">');
                             $('body').append(form);
                             form.submit();
+                            console.log(2)
                         } else {
-                            $("#response-wrapper").html('<br><pre class="prettyprint">' + response.body.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>');
-                            iframe.document.write('<br><pre>' + response.body + '</pre>');
+                            $("#response-wrapper").html('<div class="prettyprint">' + result.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>');
+                            iframe.document.write('<div>' + result + '</div>');
+                            console.log(3)
                         }
 
                         iframe.document.close();
                         iframe.document.body.style.wordWrap = 'break-word';
 
+
                         $("body,html").animate({
                             scrollTop: $('#responseContainer').offset().top
                         }, "slow");
+
+
+                        // preview: 接口响应的json输出颜色pretty @author 光剑 2017.3.24
+                        $('#res-tab-preview').JSONView(result,
+                            {
+                                collapsed: true,
+                                nl2br: false,
+                                recursive_collapser: true,
+                                escape: true
+                            }
+                        );
                     }
 
                     var assertResults = response.assertionDTO.bodyAssertDTOs;
@@ -666,7 +688,7 @@ define(function (require) {
                     var iframe = document.getElementById('response-preview');
                     iframe = (iframe.contentWindow) ? iframe.contentWindow : (iframe.contentDocument.document) ? iframe.contentDocument.document : iframe.contentDocument;
                     iframe.document.open();
-                    $("#response-wrapper").html('<br><pre class="prettyprint"> Check the URL </pre>');
+                    $("#response-wrapper").html('<br><div class="prettyprint"> Check the URL </div>');
                     iframe.document.close();
                     $('#loadingRequest').hide();
                 },
@@ -906,8 +928,12 @@ define(function (require) {
 
             this.$el.find("#response-wrapper").html('');
 
-            var iframe = document.getElementById("response-preview"),
-                iframe = iframe.contentDocument || iframe.contentWindow.document;
+            var iframe = document.getElementById("response-preview");
+
+            // if(iframe.contentDocument!=undefined && iframe.contentDocument!=null ){
+            //     iframe = iframe.contentDocument || iframe.contentWindow.document;
+            // }
+
             if (iframe.documentElement) {
                 iframe.removeChild(iframe.documentElement);
             }
@@ -942,15 +968,85 @@ define(function (require) {
 
                 conversation.save(null, {
                     success: function () {
-                        alert('Changes saved successfully!');
+                        alert('保存成功!');
+
+                        // BootstrapDialog.show({
+                        //     closable: false,
+                        //     title: '测试用例',
+                        //     message: '保存成功',
+                        //     buttons: [
+                        //         {
+                        //             label: '确定',
+                        //             cssClass: 'btn btn- btn-primary',
+                        //             autospin: false,
+                        //             action: function (dialogRef) {
+                        //                 dialogRef.close();
+                        //             }
+                        //         },
+                        //         {
+                        //             label: '取消',
+                        //             cssClass: 'btn btn-default',
+                        //             autospin: false,
+                        //             action: function (dialogRef) {
+                        //                 dialogRef.close();
+                        //             }
+                        //         }
+                        //     ]
+                        // });
                     },
                     error: function () {
-                        alert('some error occured while saving the request');
+                        alert('保存请求失败！某个地方可能出错了');
+                        // BootstrapDialog.show({
+                        //     closable: false,
+                        //     title: '测试用例',
+                        //     message: '保存失败',
+                        //     buttons: [
+                        //         {
+                        //             label: '确定',
+                        //             cssClass: 'btn btn- btn-primary',
+                        //             autospin: false,
+                        //             action: function (dialogRef) {
+                        //                 dialogRef.close();
+                        //             }
+                        //         },
+                        //         {
+                        //             label: '取消',
+                        //             cssClass: 'btn btn-default',
+                        //             autospin: false,
+                        //             action: function (dialogRef) {
+                        //                 dialogRef.close();
+                        //             }
+                        //         }
+                        //     ]
+                        // });
                     }
                 });
             } else {
                 if ($("#tree").fancytree("getTree").activeNode == null) {
-                    alert("Create/Select a Project before saving request");
+                    alert("保存之前请新建或选择一个项目");
+                    // BootstrapDialog.show({
+                    //     closable: false,
+                    //     title: '测试用例',
+                    //     message: '保存之前请新建或选择一个项目',
+                    //     buttons: [
+                    //         {
+                    //             label: '确定',
+                    //             cssClass: 'btn btn- btn-primary',
+                    //             autospin: false,
+                    //             action: function (dialogRef) {
+                    //                 dialogRef.close();
+                    //             }
+                    //         },
+                    //         {
+                    //             label: '取消',
+                    //             cssClass: 'btn btn-default',
+                    //             autospin: false,
+                    //             action: function (dialogRef) {
+                    //                 dialogRef.close();
+                    //             }
+                    //         }
+                    //     ]
+                    // });
                     return;
                 }
                 $("#requestModal").find("#source").val("conversation");

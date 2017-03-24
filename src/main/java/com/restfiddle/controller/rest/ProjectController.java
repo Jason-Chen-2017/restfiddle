@@ -19,6 +19,15 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.restfiddle.constant.NodeType;
+import com.restfiddle.dao.NodeRepository;
+import com.restfiddle.dao.ProjectRepository;
+import com.restfiddle.dao.WorkspaceRepository;
+import com.restfiddle.dto.NodeDTO;
+import com.restfiddle.dto.ProjectDTO;
+import com.restfiddle.entity.BaseNode;
+import com.restfiddle.entity.Project;
+import com.restfiddle.entity.Workspace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -31,16 +40,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.restfiddle.constant.NodeType;
-import com.restfiddle.dao.NodeRepository;
-import com.restfiddle.dao.ProjectRepository;
-import com.restfiddle.dao.WorkspaceRepository;
-import com.restfiddle.dto.NodeDTO;
-import com.restfiddle.dto.ProjectDTO;
-import com.restfiddle.entity.BaseNode;
-import com.restfiddle.entity.Project;
-import com.restfiddle.entity.Workspace;
 
 @RestController
 @EnableAutoConfiguration
@@ -58,60 +57,64 @@ public class ProjectController {
     @Resource
     private NodeRepository nodeRepository;
 
-    @RequestMapping(value = "/api/workspaces/{workspaceId}/projects", method = RequestMethod.POST, headers = "Accept=application/json")
-    public @ResponseBody
+    @RequestMapping(value = "/api/workspaces/{workspaceId}/projects", method = RequestMethod.POST,
+        headers = "Accept=application/json")
+    public
+    @ResponseBody
     Project create(@PathVariable("workspaceId") String workspaceId, @RequestBody ProjectDTO projectDTO) {
-	logger.debug("Creating a new project with information: " + projectDTO);
+        logger.debug("Creating a new project with information: " + projectDTO);
 
-	// Create project
-	Project project = new Project();
-	project.setName(projectDTO.getName());
-	project.setDescription(projectDTO.getDescription());
+        // Create project
+        Project project = new Project();
+        project.setName(projectDTO.getName());
+        project.setDescription(projectDTO.getDescription());
 
-	// Create project reference node
-	BaseNode projectRef = new BaseNode();
-	projectRef.setName(projectDTO.getName());
-	projectRef.setNodeType(NodeType.PROJECT.name());
-	projectRef.setParentId("-1");
-	projectRef.setPosition(Long.valueOf(0));
-	projectRef.setWorkspaceId(workspaceId);
+        // Create project reference node
+        BaseNode projectRef = new BaseNode();
+        projectRef.setName(projectDTO.getName());
+        projectRef.setNodeType(NodeType.PROJECT.name());
+        projectRef.setParentId("-1");
+        projectRef.setPosition(Long.valueOf(0));
+        projectRef.setWorkspaceId(workspaceId);
 
-	// Save project reference node
-	BaseNode savedRef = nodeRepository.save(projectRef);
+        // Save project reference node
+        BaseNode savedRef = nodeRepository.save(projectRef);
 
-	// Set project reference node
-	project.setProjectRef(savedRef);
+        // Set project reference node
+        project.setProjectRef(savedRef);
 
-	Project savedProject = projectRepository.save(project);
+        Project savedProject = projectRepository.save(project);
 
-	// Update projectRef (Set projectId to the reference node)
-	projectRef.setProjectId(savedProject.getId());
-	nodeRepository.save(projectRef);
+        // Update projectRef (Set projectId to the reference node)
+        projectRef.setProjectId(savedProject.getId());
+        nodeRepository.save(projectRef);
 
-	// Update workspace
-	Workspace workspace = workspaceRepository.findOne(workspaceId);
-	workspace.getProjects().add(savedProject);
-	workspaceRepository.save(workspace);
+        // Update workspace
+        Workspace workspace = workspaceRepository.findOne(workspaceId);
+        workspace.getProjects().add(savedProject);
+        workspaceRepository.save(workspace);
 
-	return savedProject;
+        return savedProject;
     }
 
-    @RequestMapping(value = "/api/workspaces/{workspaceId}/projects/{id}", method = RequestMethod.DELETE, headers = "Accept=application/json")
-    public @ResponseBody
+    @RequestMapping(value = "/api/workspaces/{workspaceId}/projects/{id}", method = RequestMethod.DELETE,
+        headers = "Accept=application/json")
+    public
+    @ResponseBody
     void delete(@PathVariable("workspaceId") String workspaceId, @PathVariable("id") String id) {
-	logger.debug("Deleting project with id: " + id);
+        logger.debug("Deleting project with id: " + id);
 
-	Project projectToBeDeleted = projectRepository.findOne(id);
+        Project projectToBeDeleted = projectRepository.findOne(id);
 
-	List<BaseNode> listOfNodes = nodeRepository.findNodesFromAProject(id);
+        List<BaseNode> listOfNodes = nodeRepository.findNodesFromAProject(id);
 
-	nodeRepository.delete(listOfNodes);
+        nodeRepository.delete(listOfNodes);
 
-	projectRepository.delete(projectToBeDeleted);
+        projectRepository.delete(projectToBeDeleted);
 
-	Workspace workspace = workspaceRepository.findOne(workspaceId);
-	workspace.getProjects().remove(projectToBeDeleted);
-	workspaceRepository.save(workspace);
+        Workspace workspace = workspaceRepository.findOne(workspaceId);
+        workspace.getProjects().remove(projectToBeDeleted);
+        workspaceRepository.save(workspace);
     }
 
     /*@RequestMapping(value = "/api/workspaces/{workspaceId}/projects", method = RequestMethod.GET)
@@ -123,58 +126,72 @@ public class ProjectController {
     }*/
 
     public List<Project> findAll() {
-	logger.debug("Finding all projects");
+        logger.debug("Finding all projects");
 
-	return projectRepository.findAll();
+        return projectRepository.findAll();
     }
 
     @RequestMapping(value = "/api/workspaces/{workspaceId}/projects/{id}", method = RequestMethod.GET)
-    public @ResponseBody
+    public
+    @ResponseBody
     Project findById(@PathVariable("workspaceId") String workspaceId, @PathVariable("id") String id) {
-	logger.debug("Finding project by id: " + id);
+        logger.debug("Finding project by id: " + id);
 
-	return projectRepository.findOne(id);
+        return projectRepository.findOne(id);
     }
 
-    @RequestMapping(value = "/api/workspaces/{workspaceId}/projects/{id}", method = RequestMethod.PUT, headers = "Accept=application/json")
-    public @ResponseBody
-    Project update(@PathVariable("workspaceId") String workspaceId, @PathVariable("id") String id, @RequestBody ProjectDTO updated) {
-	logger.debug("Updating project with information: " + updated);
+    @RequestMapping(value = "/api/workspaces/{workspaceId}/projects/{id}", method = RequestMethod.PUT,
+        headers = "Accept=application/json")
+    public
+    @ResponseBody
+    Project update(@PathVariable("workspaceId") String workspaceId, @PathVariable("id") String id,
+                   @RequestBody ProjectDTO updated) {
+        logger.debug("Updating project with information: " + updated);
 
-	Project project = projectRepository.findOne(updated.getId());
-	BaseNode projectRef = project.getProjectRef();
+        Project project = projectRepository.findOne(updated.getId());
+        BaseNode projectRef = project.getProjectRef();
 
-	String updatedName = updated.getName();
-	if (updatedName != null) {
-	    project.setName(updatedName);
-	    projectRef.setName(updatedName);
-	}
+        String updatedName = updated.getName();
+        if (updatedName != null) {
+            project.setName(updatedName);
+            projectRef.setName(updatedName);
+        }
 
-	String updatedDescription = updated.getDescription();
-	if (updatedDescription != null) {
-	    project.setDescription(updatedDescription);
-	    projectRef.setDescription(updatedDescription);
-	}
+        String updatedDescription = updated.getDescription();
+        if (updatedDescription != null) {
+            project.setDescription(updatedDescription);
+            projectRef.setDescription(updatedDescription);
+        }
 
-	nodeRepository.save(projectRef);
-	projectRepository.save(project);
+        nodeRepository.save(projectRef);
+        projectRepository.save(project);
 
-	return project;
+        return project;
     }
 
-    @RequestMapping(value = "/api/workspaces/{workspaceId}/projects/{id}/copy", method = RequestMethod.POST, headers = "Accept=application/json")
-    public @ResponseBody
-    void copy(@PathVariable("workspaceId") String workspaceId, @PathVariable("id") String id, @RequestBody NodeDTO nodeDTO) {
-	String nodeType = nodeDTO.getNodeType();
-	if (!NodeType.PROJECT.name().equalsIgnoreCase(nodeType)) {
-	    return;
-	}
+    @RequestMapping(value = "/api/workspaces/{workspaceId}/projects/{id}/copy", method = RequestMethod.POST,
+        headers = "Accept=application/json")
+    public
+    @ResponseBody
+    void copy(@PathVariable("workspaceId") String workspaceId, @PathVariable("id") String id,
+              @RequestBody NodeDTO nodeDTO) {
+        String nodeType = nodeDTO.getNodeType();
+        if (!NodeType.PROJECT.name().equalsIgnoreCase(nodeType)) {
+            return;
+        }
 
-	BaseNode node = nodeRepository.findOne(id);
-	node.setName(nodeDTO.getName());
-	node.setDescription(nodeDTO.getDescription());
-	// TODO : Use NodeController#copyNodesRecursively.
-	// copyNodesRecursively(node, node.getParentId());
+        BaseNode node = nodeRepository.findOne(id);
+        node.setName(nodeDTO.getName());
+        node.setDescription(nodeDTO.getDescription());
+        // TODO : Use NodeController#copyNodesRecursively.
+        // copyNodesRecursively(node, node.getParentId());
+    }
+
+    @RequestMapping(value = "/api/project/list", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    List<Project> findAllRfRequest() {
+        return projectRepository.findAll();
     }
 
 }
