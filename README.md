@@ -9,49 +9,28 @@ RESTFeel
 
 
 
+> RESTFeel: 一个企业级的API管理&测试平台。RESTFeel帮助你设计、开发、测试您的API。
+
+###功能简介：
+
+* 请求生成器-使HTTP请求轻松。
+* 请求树以树的形式组织请求。
+* 合作-添加团队成员，管理多个项目。
+* PDF报告-生成项目状态报告PDF格式。
+* 历史-查看历史/活动日志。
+* 自定义的时间间隔运行API项目。
+* SendGrid - SendGrid集成发送通知。
+* 云部署-它可以部署在任何服务器上，也可以用来作为一个基于云的托管Web应用程序。
+* 私人-安装在您的环境和完全拥有它。与你的团队一起在你的私人网络中工作。
+* 数据库-存储在您的数据库中的一切。
+* swagger API文档生成。
+* 标签-标签提供了一个有用的方式来组合相关的要求。
+* 安全，访问控制，通知机制等。
 
 
 
->源自开源项目：
-[RESTFiddle](http://www.restfiddle.com/)
 
-
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AnujaK/restfiddle?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-[![Build Status](https://travis-ci.org/AnujaK/restfiddle.svg?branch=master)](https://travis-ci.org/AnujaK/restfiddle)
-
-
-
-An Enterprise-grade API Management Platform for Teams. RESTFiddle helps you design, develop, test and release APIs.
-
-Some of the key features of this platform are:
-
-* Request Builder - Make HTTP requests with ease.
-* Request Tree - Organize requests in the form of a tree.
-* Collaboration - Add as many collaborators as you want from your team and work together on a project.
-* PDF Reports - Generate project status reports in PDF format.
-* Integration - RESTFiddle platform exposes APIs for everything it has.
-* History - Unlimited history/activity log.
-* Scheduler - Run API projects on predefined time intervals.
-* SendGrid - SendGrid integration to send notifications.
-* Cloud Deployment - It can be deployed over any server and can also be used as a cloud based hosted web application.
-* Private - Install it in your environment and own it completely. Work together with your team in your private network.
-* Database - Store everything in your database.
-* Swagger - Access RESTFiddle API documentation using Swagger UI.
-* Tagging - Tags provide a useful way to group related requests together.
-* Open Source - Fork it and build the features of your choice.
-* More - Security, Access Control, Notifications and much more.
-
-A lot of powerful features coming soon!
-
-Who Uses RESTFiddle
-==========
-
-##### The following is a list of companies and projects using RESTFiddle:
-
-* BootSimply Solutions (http://bootsimply.com/)
-
-Want to be added to this section? Email me at contact at bootsimply dot com.
+#MongoDB configuration:
 
 Building From Source
 ==========
@@ -97,16 +76,6 @@ Note : To avoid java.lang.OutOfMemoryError: PermGen space, use the following com
 ```
 MAVEN_OPTS="-XX:PermSize=256m -XX:MaxPermSize=512m" mvn spring-boot:run 
 ```
-
-##### MongoDB configuration:
-
-
->參考文章：
-
-[《MongoDB极简教程》第一章 安装&环境配置](http://www.jianshu.com/p/3d6a493f6418)
-
-
-[《MongoDB极简教程》第二章 MongoDB 基本命令](http://www.jianshu.com/p/d7bb76febcad)
 
 
 
@@ -265,6 +234,60 @@ db.createUser({"user":"jason","pwd":"123456","roles":["dbOwner","read","readWrit
 Fetched 4 record(s) in 9ms
 
 ```
+
+
+
+參考文章：
+
+[《MongoDB极简教程》第一章 安装&环境配置](http://www.jianshu.com/p/3d6a493f6418)
+
+
+[《MongoDB极简教程》第二章 MongoDB 基本命令](http://www.jianshu.com/p/d7bb76febcad)
+
+
+
+
+
+>源自开源项目：
+[RESTFiddle](http://www.restfiddle.com/)
+
+
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AnujaK/restfiddle?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+[![Build Status](https://travis-ci.org/AnujaK/restfiddle.svg?branch=master)](https://travis-ci.org/AnujaK/restfiddle)
+
+
+
+An Enterprise-grade API Management Platform for Teams. RESTFiddle helps you design, develop, test and release APIs.
+
+Some of the key features of this platform are:
+
+* Request Builder - Make HTTP requests with ease.
+* Request Tree - Organize requests in the form of a tree.
+* Collaboration - Add as many collaborators as you want from your team and work together on a project.
+* PDF Reports - Generate project status reports in PDF format.
+* Integration - RESTFiddle platform exposes APIs for everything it has.
+* History - Unlimited history/activity log.
+* Scheduler - Run API projects on predefined time intervals.
+* SendGrid - SendGrid integration to send notifications.
+* Cloud Deployment - It can be deployed over any server and can also be used as a cloud based hosted web application.
+* Private - Install it in your environment and own it completely. Work together with your team in your private network.
+* Database - Store everything in your database.
+* Swagger - Access RESTFiddle API documentation using Swagger UI.
+* Tagging - Tags provide a useful way to group related requests together.
+* Open Source - Fork it and build the features of your choice.
+* More - Security, Access Control, Notifications and much more.
+
+A lot of powerful features coming soon!
+
+Who Uses RESTFiddle
+==========
+
+##### The following is a list of companies and projects using RESTFiddle:
+
+* BootSimply Solutions (http://bootsimply.com/)
+
+Want to be added to this section? Email me at contact at bootsimply dot com.
 
 
 
